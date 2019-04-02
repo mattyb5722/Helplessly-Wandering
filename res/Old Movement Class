@@ -426,14 +426,14 @@ public class Movement {
 	}
 
 	public void itemsmoving(){
-		for(int j = 0; j < main.getItems().length; j++){
-			if(main.getItems()[j][7] == "true"){
-				main.getItems()[j][1] = Integer.toString(main.getTileX());
-				main.getItems()[j][2] = Integer.toString(main.getTileY());
-				main.getItems()[j][3] = Integer.toString(main.getTileZ());
-				main.getItems()[j][4] = Integer.toString(main.getInTileX());
-				main.getItems()[j][5] = Integer.toString(main.getInTileY());
-				main.getItems()[j][6] = Integer.toString(main.getInTileZ());
+		for (Item temp: main.getBag()) {
+			if (temp != null) {
+				temp.getOutside().x = main.getTileX();
+				temp.getOutside().y = main.getTileY();
+				temp.getOutside().z = main.getTileZ();
+				temp.getInside().x = main.getInTileX();
+				temp.getInside().y = main.getInTileY();
+				temp.getInside().z = main.getInTileZ();
 			}
 		}
 	}

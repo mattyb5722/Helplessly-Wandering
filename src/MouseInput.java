@@ -18,7 +18,7 @@ public class MouseInput implements MouseListener{
 			if(mx < MainBody.WIDTH/2+125 && mx > MainBody.WIDTH/2-125){
 				if(my < 350 && my > 250){
 					main.setMenu(main.getMenu().GAME);
-					t.start_text();
+					t.StartText();
 				}
 			}
 			if(mx < MainBody.WIDTH/2+125 && mx > MainBody.WIDTH/2-125){
