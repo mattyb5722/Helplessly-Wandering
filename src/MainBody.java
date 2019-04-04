@@ -8,8 +8,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicReference;
-
 import javax.swing.JFrame;
 
 public class MainBody extends Canvas{
@@ -35,9 +33,6 @@ public class MainBody extends Canvas{
 
 	private MENU menu = MENU.MENU;
 	private PHASE Phase = PHASE.MOVING;
-	
-	private Location outside = new Location(2, 3, 0);
-	private Location inside = new Location(0, 0, 0);
 	
 	public Room room;
 	public Room pastRoom;
@@ -71,12 +66,12 @@ public class MainBody extends Canvas{
 			BackGround = loader.loadImage("/Scroll Small.png");
 		} catch (IOException e) {e.printStackTrace();}
 		
-		rooms = new Rooms();
-		items = new Items();
+		rooms = Rooms.getInstance();
+		items = new Items(rooms);
 		ren = new Render(this);
 		text = new Text(this, items);
 		mon = new Monster(this,text);
-		rep = new Reponses(this, text, mon, items);
+		rep = new Reponses(this, text, mon, items, rooms);
 		this.addKeyListener(new KeyInput(this,mon));
 		this.addMouseListener(new MouseInput(this,text));
 		
@@ -120,10 +115,8 @@ public class MainBody extends Canvas{
 			(findKeyword(statement, "east") >= 0)  || (findKeyword(statement, "west") >= 0)  ||
 			(findKeyword(statement, "up") >= 0)    || (findKeyword(statement, "down") >= 0)){
 			rep.move(statement);
-			//FindLocation();
 			text.location_text();
 			text.item_text();
-			//move.itemsmoving();
 			dying();
 			mon.location();
 		}else if ((statement.indexOf("check bag") >= 0)){
@@ -149,21 +142,6 @@ public class MainBody extends Canvas{
 		}else{
 			addMessage("What are you trying to say?", "AI");
 		}addMessage("","AI");
-		
-		System.out.println("room.getID(): " + room.getID());
-		if (room.getNorth() == null) {
-			System.out.println("No North");
-		}
-		if (room.getSouth() == null) {
-			System.out.println("No South");
-		}
-		if (room.getEast() == null) {
-			System.out.println("No East");
-		}
-		if (room.getWest() == null) {
-			System.out.println("No West");
-		}
-		System.out.println();
 	}
  		
 	public int findKeyword(String phrase, String goal){
@@ -308,11 +286,5 @@ public class MainBody extends Canvas{
 	}
 	public void setStatement(String statement) {
 		Statement = statement;
-	}
-	public Location getOutside() {
-		return outside;
-	}
-	public Location getInside() {
-		return inside;
 	}
 }

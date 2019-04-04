@@ -6,13 +6,15 @@ public class Reponses {
 	Text t;
 	Monster mon;
 	Items items;
+	Rooms rooms;
 	Random r = new Random();
 	
-	public Reponses(MainBody main, Text t, Monster mon, Items items){
+	public Reponses(MainBody main, Text t, Monster mon, Items items, Rooms rooms){
 		this.main = main;
 		this.t= t;
 		this.mon = mon;
 		this.items = items;
+		this.rooms = rooms;
 	}
 	
 	public void move(String statement){
@@ -60,6 +62,8 @@ public class Reponses {
 				main.pastRoom = old;
 				for (Item temp: main.getBag()) {
 					if (temp != null) {
+						temp.setLocation(main.room);
+						/*
 						temp.getOutside().x = main.getOutside().x;
 						temp.getOutside().y = main.getOutside().y;
 						temp.getOutside().z = main.getOutside().z;
@@ -67,6 +71,7 @@ public class Reponses {
 						temp.getInside().x = main.getInside().x;
 						temp.getInside().y = main.getInside().y;
 						temp.getInside().z = main.getInside().z;
+						*/
 					}
 				}
 			}
@@ -94,17 +99,20 @@ public class Reponses {
 			boolean alreadyhad = true;
 			
 			for (Item temp: items.getItems()) {
+				if((temp.isOnPlayer() == false) && temp.getLocation().getID() == main.room.getID()) {
+					/*
 				if ((main.findKeyword(statement, temp.getID()) >= 0) 
 				 && (temp.getOutside().x == main.getOutside().x)  && (temp.getOutside().y == main.getOutside().y)
 				 && (temp.getOutside().z == main.getOutside().z)  && (temp.getInside().x == main.getInside().x)
 				 && (temp.getInside().y == main.getInside().y)    && (temp.getInside().z == main.getInside().z)){
+				 */
 					location = true;
-					if (temp.isPickedUp() == false){
+					if (temp.isOnPlayer() == false){
 						alreadyhad = false;
 						for(int i = 0; i < main.getBag().length; i++){
 							if ((taking) && (main.getBag()[i] == null)){
 								main.setBag(temp, i);
-								temp.setPickedUp(true);
+								temp.setOnPlayer(true);
 								temp.setPlace("onself");
 								main.addMessage(temp.getID() + " has been added to your bag", "AI");
 								taking = false;
@@ -128,7 +136,7 @@ public class Reponses {
 			Item temp = main.getBag()[i];
 			if (temp != null){
 				if (main.findKeyword(statement, temp.getID()) >= 0){
-					temp.setPickedUp(false);
+					temp.setOnPlayer(false);
 					temp.setPlace("onground");
 					/*
 					for (int j = 0; j < main.getItems().length; j++){
@@ -154,7 +162,7 @@ public class Reponses {
 			if (temp != null){
 				if (main.findKeyword(statement, temp.getID()) >= 0){
 					have = true;
-					if((main.getOutside().x == 1) && (main.getOutside().y == 0) && (main.getOutside().z == 0)){
+					if (main.room.getID() == rooms.boatBoat.getID()){
 						if(main.findKeyword(temp.getID(), "engine") >= 0){
 					   		main.addMessage("The engine fits right onto the boat.","AI");
 							main.setGameEnding(true, 0);
@@ -174,19 +182,19 @@ public class Reponses {
 						}
 					//Keys
 					}else if(main.findKeyword(temp.getID(), "house key") >= 0){
-						if((main.getOutside().x == 3)&&(main.getOutside().y == 4)&&(main.getOutside().z == 0)){
+						if (main.room.getID() == rooms.x3y4.getID()){
 							main.setLockedDoors(true, 0);
 					   		main.addMessage("You unlock the door.","AI");
 					   		abletouse = true;
 						}
 					}else if(main.findKeyword(temp.getID(), "shack key") >= 0){
-						if((main.getOutside().x == 1)&&(main.getOutside().y == 7)&&(main.getOutside().z == 0)){
+						if (main.room.getID() == rooms.x1y6.getID()){
 							main.setLockedDoors(true, 1);
 					   		main.addMessage("You unlock the door.","AI");
 					   		abletouse = true;
 						}
 					}else if(main.findKeyword(temp.getID(), "treehouse key") >= 0){
-						if((main.getOutside().x == 4)&&(main.getOutside().y == 7)&&(main.getOutside().z == 0)){
+						if (main.room.getID() == rooms.treeHouseGround.getID()){
 							main.setLockedDoors(true, 2);
 					   		main.addMessage("You unlock the hach.","AI");
 					   		abletouse = true;
@@ -269,8 +277,9 @@ public class Reponses {
 				main.addMessage("You have used " + temp.getID(), "AI");
 				temp.setDurability(temp.getDurability() - 1 );
 				if (temp.getDurability() == 0) {
-					temp.getOutside().x = -1;
-					temp.setPickedUp(false);					
+					//temp.getOutside().x = -1;
+					temp.setLocation(rooms.mountain);
+					temp.setOnPlayer(false);					
 					main.setBag(null, i);
 				}
 				if(main.getThirst() > 125){

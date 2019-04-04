@@ -224,10 +224,14 @@ public class Text {
 	
 	public void item_text(){
 		for(Item temp: items.getItems()){
-			if((temp.isPickedUp() == false)
+			if((temp.isOnPlayer() == false) && temp.getLocation().getID() == main.room.getID()) {
+			/*	
+			if((temp.isOnPlayer() == false)
 			 && (temp.getOutside().x == main.getOutside().x)  && (temp.getOutside().y == main.getOutside().y)
 			 && (temp.getOutside().z == main.getOutside().z)  && (temp.getInside().x == main.getInside().x)
 			 && (temp.getInside().y == main.getInside().y) && (temp.getInside().z == main.getInside().z)){
+			*/
+
 				if(temp.getPlace() == "onground"){
 					main.addMessage("Lying on the ground is a " + temp.getID() + ".", "AI");
 				}else if(temp.getPlace() == "ontable"){

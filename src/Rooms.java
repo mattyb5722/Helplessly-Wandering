@@ -1,82 +1,90 @@
 
 public class Rooms {
 	
+	private static Rooms instance = null;
+	
 	// Other
-	private Room water = new Room("water");
-	private Room mountain = new Room("mountain");
-	private Room wall = new Room("wall");
-	private Room forest = new Room("forest");
-	private Room nothing = new Room("nothing");
+	public Room water = new Room("water");
+	public Room mountain = new Room("mountain");
+	public Room wall = new Room("wall");
+	public Room forest = new Room("forest");
+	public Room nothing = new Room("nothing");
 
 	// Over World
-	private Room x0y3 = new Room("x0y3"); private Room x0y4 = new Room("x0y4");
-	private Room x0y5 = new Room("x0y5"); private Room x0y6 = new Room("x0y6");
+	public Room x0y3 = new Room("x0y3"); public Room x0y4 = new Room("x0y4");
+	public Room x0y5 = new Room("x0y5"); public Room x0y6 = new Room("x0y6");
 	
-	private Room x1y1 = new Room("x1y1"); private Room x1y2 = new Room("x1y2");
-	private Room x1y3 = new Room("x1y3"); private Room x1y6 = new Room("x1y6");
+	public Room x1y1 = new Room("x1y1"); public Room x1y2 = new Room("x1y2");
+	public Room x1y3 = new Room("x1y3"); public Room x1y6 = new Room("x1y6");
 	
-	private Room x2y0 = new Room("x2y0"); private Room x2y1 = new Room("x2y1");
-	private Room x2y3 = new Room("x2y3"); private Room x2y6 = new Room("x2y6");
-	private Room x2y7 = new Room("x2y7");
+	public Room x2y0 = new Room("x2y0"); public Room x2y1 = new Room("x2y1");
+	public Room x2y3 = new Room("x2y3"); public Room x2y6 = new Room("x2y6");
+	public Room x2y7 = new Room("x2y7");
 	
-	private Room x3y1 = new Room("x3y1"); private Room x3y2 = new Room("x3y2");
-	private Room x3y3 = new Room("x3y3"); private Room x3y4 = new Room("x3y4");
-	private Room x3y6 = new Room("x3y6"); private Room x3y7 = new Room("x3y7");
+	public Room x3y1 = new Room("x3y1"); public Room x3y2 = new Room("x3y2");
+	public Room x3y3 = new Room("x3y3"); public Room x3y4 = new Room("x3y4");
+	public Room x3y6 = new Room("x3y6"); public Room x3y7 = new Room("x3y7");
 	
-	private Room x4y1 = new Room("x4y1"); private Room x4y3 = new Room("x4y3");
-	private Room x4y4 = new Room("x4y4"); private Room x4y5 = new Room("x4y5");
-	private Room x4y6 = new Room("x4y6");
+	public Room x4y1 = new Room("x4y1"); public Room x4y3 = new Room("x4y3");
+	public Room x4y4 = new Room("x4y4"); public Room x4y5 = new Room("x4y5");
+	public Room x4y6 = new Room("x4y6");
 	
-	private Room x5y3 = new Room("x5y3"); private Room x5y4 = new Room("x5y4");
-	private Room x5y5 = new Room("x5y5");
+	public Room x5y3 = new Room("x5y3"); public Room x5y4 = new Room("x5y4");
+	public Room x5y5 = new Room("x5y5");
 	
-	private Room tree = new Room("tree");
+	public Room tree = new Room("tree");
 	
 	// Boat:
-	private Room boatBoat = new Room("Boat Boat");
-	private Room boatLand = new Room("Boat Land");
+	public Room boatBoat = new Room("Boat Boat");
+	public Room boatLand = new Room("Boat Land");
 	
 	// Plane
-	private Room planeCockpit = new Room("Plane Cockpit");
-	private Room planePassenger = new Room("Plane Passenger");
-	private Room planeStorage = new Room("Plane Sotrage");
+	public Room planeCockpit = new Room("Plane Cockpit");
+	public Room planePassenger = new Room("Plane Passenger");
+	public Room planeStorage = new Room("Plane Sotrage");
 	
 	// Shack 
-	private Room shackMainRoom = new Room ("Shack Main Room");
-	private Room shackCellar = new Room ("Shack Cellar");
+	public Room shackMainRoom = new Room ("Shack Main Room");
+	public Room shackCellar = new Room ("Shack Cellar");
 	
 	// Temple
-	private Room templeMainRoom = new Room("Temple Main Room");
-	private Room templeWestRoom = new Room("Temple West Room");
-	private Room templeEastRoom = new Room("Temple East Room");
+	public Room templeMainRoom = new Room("Temple Main Room");
+	public Room templeWestRoom = new Room("Temple West Room");
+	public Room templeEastRoom = new Room("Temple East Room");
 	
-	private Room MAZE_x0y0 = new Room("Maze x0y0"); private Room MAZE_x0y1 = new Room("Maze x0y1");
-	private Room MAZE_x0y2 = new Room("Maze x0y2"); private Room MAZE_x0y3 = new Room("Maze x0y3");
+	public Room MAZE_x0y0 = new Room("Maze x0y0"); public Room MAZE_x0y1 = new Room("Maze x0y1");
+	public Room MAZE_x0y2 = new Room("Maze x0y2"); public Room MAZE_x0y3 = new Room("Maze x0y3");
 	
-	private Room MAZE_x1y0 = new Room("Maze x1y0"); private Room MAZE_START = new Room("Maze x1y1");
-	private Room MAZE_x1y2 = new Room("Maze x1y2"); private Room MAZE_x1y3 = new Room("Maze x1y3");
+	public Room MAZE_x1y0 = new Room("Maze x1y0"); public Room MAZE_START = new Room("Maze x1y1");
+	public Room MAZE_x1y2 = new Room("Maze x1y2"); public Room MAZE_x1y3 = new Room("Maze x1y3");
 	
-	private Room MAZE_x2y0 = new Room("Maze x2y0"); private Room MAZE_x2y1 = new Room("Maze x2y1");
-	private Room MAZE_x2y2 = new Room("Maze x2y2"); private Room MAZE_x2y3 = new Room("Maze x2y3");
+	public Room MAZE_x2y0 = new Room("Maze x2y0"); public Room MAZE_x2y1 = new Room("Maze x2y1");
+	public Room MAZE_x2y2 = new Room("Maze x2y2"); public Room MAZE_x2y3 = new Room("Maze x2y3");
 	
-	private Room MAZE_x3y0 = new Room("Maze x3y0"); private Room MAZE_x3y1 = new Room("Maze x3y1");
-	private Room MAZE_x3y2 = new Room("Maze x3y2"); private Room MAZE_x3y3 = new Room("Maze x3y3");
+	public Room MAZE_x3y0 = new Room("Maze x3y0"); public Room MAZE_x3y1 = new Room("Maze x3y1");
+	public Room MAZE_x3y2 = new Room("Maze x3y2"); public Room MAZE_x3y3 = new Room("Maze x3y3");
 	
 	// House 
-	private Room houseMainRoom = new Room("House Main Room");
-	private Room houseAttic = new Room("House Attic");
-	private Room houseTrapdoorRoom = new Room("House Trapdoor Room");
-	private Room houseBoxRoom = new Room("House Box Room");
+	public Room houseMainRoom = new Room("House Main Room");
+	public Room houseAttic = new Room("House Attic");
+	public Room houseTrapdoorRoom = new Room("House Trapdoor Room");
+	public Room houseBoxRoom = new Room("House Box Room");
 	
 	// Tree House 
-	private Room treeHouseGround = new Room("Tree House Ground");
-	private Room treeHouseTreeHouse = new Room("Tree House Tree House");
+	public Room treeHouseGround = new Room("Tree House Ground");
+	public Room treeHouseTreeHouse = new Room("Tree House Tree House");
 
-	public Rooms() {
+	public static Rooms getInstance() { 
+        if (instance == null) 
+        	instance = new Rooms(); 
+        return instance; 
+    } 
+	
+	private Rooms() {
 		UpdateConnections();
 	}
 	
-	public void UpdateConnections() {
+	private void UpdateConnections() {
 		// Plane
 		planeCockpit.setConnections(x2y1, planePassenger, x3y2, x1y2, nothing, nothing);
 		planePassenger.setConnections(planeCockpit, planeStorage, x3y2, x1y2, nothing, nothing);

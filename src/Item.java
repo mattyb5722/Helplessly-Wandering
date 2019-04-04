@@ -3,41 +3,28 @@ public class Item {
 
 	private String ID, place;
 	private int durability;
-	private boolean pickedUp;
-	private Location inside, outside;
-	
-	public Item(String ID, int xOut, int yOut, int zOut, int xIn, int yIn, int zIn, boolean pickedUp, String place, int durability) {
+	private boolean onPlayer;
+	private Room location;
+		
+	public Item(String ID, Room location, boolean onPlayer, String place, int durability) {
 		this.ID = ID;
-		this.outside = new Location(xOut, yOut, zOut);
-		this.inside = new Location(xIn, yIn, zIn);
-		this.pickedUp = pickedUp;
+		this.location = location;
+		this.onPlayer = onPlayer;
 		this.place = place;
 		this.durability = durability;
 	}
+	
 		
 	public String getID() {
 		return ID;
 	}
 	
-	public boolean isPickedUp() {
-		return pickedUp;
+	public boolean isOnPlayer() {
+		return onPlayer;
 	}	
-	public void setPickedUp(boolean pickedUp) {
-		this.pickedUp = pickedUp;
+	public void setOnPlayer(boolean onPlayer) {
+		this.onPlayer = onPlayer;
 	}
-	public Location getInside() {
-		return inside;
-	}
-	public void setInside(Location inside) {
-		this.inside = inside;
-	}
-	public Location getOutside() {
-		return outside;
-	}
-	public void setOutside(Location outside) {
-		this.outside = outside;
-	}
-
 	public String getPlace() {
 		return place;
 	}
@@ -50,7 +37,10 @@ public class Item {
 	public void setDurability(int durability) {
 		this.durability = durability;
 	}
-	
-
-
+	public Room getLocation() {
+		return location;
+	}
+	public void setLocation(Room location) {
+		this.location = location;
+	}
 }
