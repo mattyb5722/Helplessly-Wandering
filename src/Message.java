@@ -1,6 +1,11 @@
 public class Message {
-	String message,from;
-	int row;
+	
+	/* This class organizes the messages on the screen */
+	
+	private final String message;		// What is in the message
+	private final String from;			// Who the message is from
+	private int row;					// Where to display the message
+	
 	public Message(String message, String from, int row){
 		this.message = message;
 		this.from = from;
@@ -10,14 +15,8 @@ public class Message {
 	public String getMessage() {
 		return message;
 	}
-	public void setMessage(String message) {
-		this.message = message;
-	}
 	public String getFrom() {
 		return from;
-	}
-	public void setFrom(String from) {
-		this.from = from;
 	}
 	public int getRow() {
 		return row;
@@ -25,5 +24,4 @@ public class Message {
 	public void setRow(int row) {
 		this.row = row;
 	}
-	
 }

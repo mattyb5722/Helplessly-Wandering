@@ -2,418 +2,218 @@ import java.util.Random;
 
 public class Reponses {
 
-	MainBody main;
-	Text t;
-	Monster mon;
-	Items items;
-	Rooms rooms;
-	Random r = new Random();
+	/* This class manages the responses to the player's commands */
 	
-	public Reponses(MainBody main, Text t, Monster mon, Items items, Rooms rooms){
+	private MainBody main;
+	private Text t;
+	private RoomManager rooms;
+	private Random r = new Random();
+	
+	public Reponses(MainBody main, Text t, RoomManager rooms){
 		this.main = main;
-		this.t= t;
-		this.mon = mon;
-		this.items = items;
+		this.t = t;
 		this.rooms = rooms;
 	}
 	
-	public void move(String statement){
-		Room old = main.room;
-		int luck = 1;
-		if (main.room.getID().substring(0,3) == "Maze") {
+	// Moves the player if it is a valid move
+	public boolean move(String statement){
+		Room oldRoom = main.getRoom();						// Room the player is leaving 
+		Room newRoom = main.getRoom();						// Room the player is going to
+		int luck = 1;										// Chance of making that move
+		if (oldRoom.getID().substring(0,3) == "Maze") {		// Luck changes in the maze
 			luck = r.nextInt(4);
 		}
-		if (luck != 3){	
-			if (main.findKeyword(statement, "north") >= 0){
-				main.room = main.room.getNorth();
-			}else if (main.findKeyword(statement, "south") >= 0){
-				main.room = main.room.getSouth();
-			}else if (main.findKeyword(statement, "east") >= 0){
-				main.room = main.room.getEast();
-			}else if (main.findKeyword(statement, "west") >= 0){
-				main.room = main.room.getWest();
-			}else if (main.findKeyword(statement, "up") >= 0){
-				main.room = main.room.getUp();
-			}else if (main.findKeyword(statement, "down") >= 0){
-				if (old.getID() == "House Attic") {
+		if (luck != 3){
+			if (main.findKeyword(statement, "north") >= 0){ 	  // Player moves to the north
+				newRoom = oldRoom.getNorth();
+			}else if (main.findKeyword(statement, "south") >= 0){ // Player moves to the south
+				newRoom = oldRoom.getSouth();
+			}else if (main.findKeyword(statement, "east") >= 0){  // Player moves to the east
+				newRoom = oldRoom.getEast();
+			}else if (main.findKeyword(statement, "west") >= 0){  // Player moves to the west
+				newRoom = oldRoom.getWest();
+			}else if (main.findKeyword(statement, "up") >= 0){    // Player moves up
+				newRoom = oldRoom.getUp();
+				if (main.getRoom().getID() == "tree") {
+					main.additem("map");
+				}
+			}else if (main.findKeyword(statement, "down") >= 0){  // Player moves down
+				if (oldRoom.getID() == "House Trapdoor Room") {
 					main.addMessage("As you descend the ladder you slip off and fall for a while.", "AI");
 					main.addMessage("After hitting the ground you open your eyes to a completely different room.", "AI");
-					main.setHealth(main.getHealth()-25);
+					main.setHealth(main.getHealth() - 25);
 				}
-				main.room = main.room.getDown();
+				newRoom = oldRoom.getDown();
 			}
 			
-			if (main.room.getID() == "water") {
-				main.room = old;
+			// Invalid moves
+			if (newRoom.getID() == "water") {
+				newRoom = oldRoom;
 				main.addMessage("There's no where to swim to", "AI");
-			}else if (main.room.getID() == "mountain") {
-				main.room = old;
-				main.addMessage("There's a mountain in the way", "AI");
-			}else if (main.room.getID() == "wall") {
-				main.room = old;
+			}else if (newRoom.getID() == "mountain") {
+				newRoom = oldRoom;
+				main.addMessage("There's no way to get up the mountain", "AI");
+			}else if (newRoom.getID() == "wall") {
+				newRoom = oldRoom;
 				main.addMessage("There's a wall there", "AI");
-			}else if (main.room.getID() == "forest") {
-				main.room = old;
+			}else if (newRoom.getID() == "forest") {
+				newRoom = oldRoom;
 				main.addMessage("The woods are too dense to pass through", "AI");
-			}else if (main.room.getID() == "nothing") {
-				main.room = old;
+			}else if (newRoom.getID() == "nothing") {
+				newRoom = oldRoom;
 				main.addMessage("There's nowhere to go", "AI");
-			}else {
-				main.pastRoom = old;
-				for (Item temp: main.getBag()) {
-					if (temp != null) {
-						temp.setLocation(main.room);
-						/*
-						temp.getOutside().x = main.getOutside().x;
-						temp.getOutside().y = main.getOutside().y;
-						temp.getOutside().z = main.getOutside().z;
-						
-						temp.getInside().x = main.getInside().x;
-						temp.getInside().y = main.getInside().y;
-						temp.getInside().z = main.getInside().z;
-						*/
-					}
-				}
+			}else if (newRoom.getID() == "House Main Room" && !main.getLockedDoors()[0]) {
+				newRoom = oldRoom;
+				main.addMessage("The door is locked. If you have the key try using it.", "AI");
+			}else if (newRoom.getID() == "Shack Main Room" && !main.getLockedDoors()[1]) {
+				newRoom = oldRoom;
+				main.addMessage("The door is locked. If you have the key try using it.", "AI");
+			}else if (newRoom.getID() == "Tree House Tree House" && !main.getLockedDoors()[2]) {
+				newRoom = oldRoom;
+				main.addMessage("The door is locked. If you have the key try using it.", "AI");
+			}else { // Was a valid move
+				main.setPastRoom(oldRoom);
+				main.setRoom(newRoom);
+				return true;
 			}
-		}	
+		}
+		main.setRoom(oldRoom);
+		return false;
 	}
 	
+	// Displays the players bag
 	public void checkbag(){
-		boolean checking = true;
-		main.addMessage("Inventory:", "AI");
-		for (Item temp: main.getBag()) {
-			if (temp != null){
-				main.addMessage("   " + temp.getID(), "AI");
-				checking = false;
-			}
-		}
-		if (checking){
+		if (rooms.player.getItems().size() == 0) {				// Bag is empty
 			main.addMessage("You have nothing in your inventory", "AI");
+		}else {
+			main.addMessage("Inventory:", "AI");
+			for (Item temp: rooms.player.getItems()) {			// For each item
+				main.addMessage("   " + temp.getID(), "AI");	// Display item
+			}
 		}
 	}
 	
+	// Pick up an item if it is a valid item
 	public void takeitem(String statement){
 		statement = (statement.substring(5, statement.length())).trim();
-			boolean taking = true;
-			boolean location = false;
-			boolean alreadyhad = true;
-			
-			for (Item temp: items.getItems()) {
-				if((temp.isOnPlayer() == false) && temp.getLocation().getID() == main.room.getID()) {
-					/*
-				if ((main.findKeyword(statement, temp.getID()) >= 0) 
-				 && (temp.getOutside().x == main.getOutside().x)  && (temp.getOutside().y == main.getOutside().y)
-				 && (temp.getOutside().z == main.getOutside().z)  && (temp.getInside().x == main.getInside().x)
-				 && (temp.getInside().y == main.getInside().y)    && (temp.getInside().z == main.getInside().z)){
-				 */
-					location = true;
-					if (temp.isOnPlayer() == false){
-						alreadyhad = false;
-						for(int i = 0; i < main.getBag().length; i++){
-							if ((taking) && (main.getBag()[i] == null)){
-								main.setBag(temp, i);
-								temp.setOnPlayer(true);
-								temp.setPlace("onself");
-								main.addMessage(temp.getID() + " has been added to your bag", "AI");
-								taking = false;
-							}
-						}
-					}
-				}
-			}if(location == false){
-				main.addMessage("You can't find anything like that", "AI");
-			}else if(alreadyhad == true){
-				main.addMessage("You already picked that item up", "AI");
-			}else if (taking == true){
-				main.addMessage("There's no room in your bag", "AI");
+		if (rooms.player.getItems().size() >= 10) {				// Bag is already full
+			main.addMessage("There's no room in your bag", "AI");
+		}else {
+			Item temp = main.getRoom().findItem(statement);		// Find the item in the room
+			if (temp == null) {									// Item is not in the room
+				main.addMessage("You can not find a " + statement, "AI");
+			}else {
+				rooms.player.addItem(temp);						// Add the item to the player's bag
+				main.getRoom().removeItem(temp);				// Remove the item from the room
+				temp.setPlace("onself");
+				main.addMessage(temp.getID() + " has been added to your bag", "AI");
 			}
-			
+		}
 	}
 	
+	// Drop an item
 	public void dropitem(String statement){
 		statement = (statement.substring(5, statement.length())).trim();
-		for (int i = 0; i < main.getBag().length; i++){
-			Item temp = main.getBag()[i];
-			if (temp != null){
-				if (main.findKeyword(statement, temp.getID()) >= 0){
-					temp.setOnPlayer(false);
-					temp.setPlace("onground");
-					/*
-					for (int j = 0; j < main.getItems().length; j++){
-						if (main.findKeyword(statement, main.getItems()[j][0]) >= 0){
-							main.setItems("false", j, 7);
-							main.setItems("onground", j, 8);
-						}
-					}
-					*/
-					main.setBag(null, i);
-					main.addMessage("You've dropped the " + statement, "AI");
-				}
-			}
+		Item temp = rooms.player.findItem(statement);			// Find the item in the room
+		if (temp == null) {										// There is nothing in the player's bag
+			main.addMessage("You do not have a " + statement, "AI");
+		}else {
+			temp.setPlace("onground");
+			rooms.player.removeItem(temp);						// Remove item from bag
+			main.getRoom().addItem(temp);						// Add item to room
+			main.addMessage("You've dropped the " + statement, "AI");
 		}
 	}
 	
+	// Checks the durability of an item
+	private void DurabilityTest(Item temp) {
+		main.addMessage(temp.getUseText(), "AI");
+		temp.setDurability(temp.getDurability() - 1);
+		if (temp.getDurability() == 0) {						// Used up an item
+			main.addMessage("You used up the last of the " + temp.getID(), "AI");
+			rooms.mountain.addItem(temp);						// Get rid of item
+			rooms.player.removeItem(temp);						// Remove item from player
+		}
+	}
+	
+	// Use an item
 	public void useitem(String statement){
 		statement = (statement.substring(4, statement.length())).trim();
-		boolean abletouse = false;
-		boolean have = false;
-		for (int i = 0; i < main.getBag().length; i++){
-			Item temp = main.getBag()[i];
-			if (temp != null){
-				if (main.findKeyword(statement, temp.getID()) >= 0){
-					have = true;
-					if (main.room.getID() == rooms.boatBoat.getID()){
-						if(main.findKeyword(temp.getID(), "engine") >= 0){
-					   		main.addMessage("The engine fits right onto the boat.","AI");
-							main.setGameEnding(true, 0);
-							abletouse = true;
-						}else if(main.findKeyword(temp.getID(), "gas") >= 0){
-					   		main.addMessage("You pour the full container of gasoline into the boat.","AI");
-							main.setGameEnding(true, 1);
-							abletouse = true;
-						}else if(main.findKeyword(temp.getID(), "boat key") >= 0){
-					   		main.addMessage("The key fits right into the ignition of the boat.","AI");
-							main.setGameEnding(true, 2);
-							abletouse = true;
-						}else if(main.findKeyword(temp.getID(), "rudder") >= 0){
-					   		main.addMessage("The rudder fits right onto the boat.","AI");
-							main.setGameEnding(true, 3);
-							abletouse = true;
-						}
-					//Keys
-					}else if(main.findKeyword(temp.getID(), "house key") >= 0){
-						if (main.room.getID() == rooms.x3y4.getID()){
-							main.setLockedDoors(true, 0);
-					   		main.addMessage("You unlock the door.","AI");
-					   		abletouse = true;
-						}
-					}else if(main.findKeyword(temp.getID(), "shack key") >= 0){
-						if (main.room.getID() == rooms.x1y6.getID()){
-							main.setLockedDoors(true, 1);
-					   		main.addMessage("You unlock the door.","AI");
-					   		abletouse = true;
-						}
-					}else if(main.findKeyword(temp.getID(), "treehouse key") >= 0){
-						if (main.room.getID() == rooms.treeHouseGround.getID()){
-							main.setLockedDoors(true, 2);
-					   		main.addMessage("You unlock the hach.","AI");
-					   		abletouse = true;
-						}					
-					//Food
-					}else if(main.findKeyword(temp.getID(), "sandwich") >= 0){
-						main.setHunger(main.getHunger()+50);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "chips") >= 0){
-						main.setHunger(main.getHunger()+25);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "candybar") >= 0){
-						main.setHunger(main.getHunger()+15);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "peanuts") >= 0){
-						main.setHunger(main.getHunger()+25);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "pretzels") >= 0){
-						main.setHunger(main.getHunger()+25);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "blueberries") >= 0){
-						main.setHunger(main.getHunger()+15);
-						main.setThirst(main.getThirst()+10);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "raspberries") >= 0){
-						main.setHunger(main.getHunger()+15);
-						main.setThirst(main.getThirst()+10);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "strawberries") >= 0){
-						main.setHunger(main.getHunger()+15);
-						main.setThirst(main.getThirst()+10);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "blackberries") >= 0){
-						main.setHunger(main.getHunger()+15);
-						main.setThirst(main.getThirst()+10);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "pomegranate") >= 0){
-						main.setHunger(main.getHunger()+15);
-						main.setThirst(main.getThirst()+10);
-						abletouse = true;
-					//Drinks
-					}else if(main.findKeyword(temp.getID(), "water bottle") >= 0){
-						main.setThirst(main.getThirst()+50);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "bottle of beer") >= 0){
-						main.setThirst(main.getThirst()+15);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "bottle of wine") >= 0){
-						main.setThirst(main.getThirst()+15);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "sodacan") >= 0){
-						main.setThirst(main.getThirst()+25);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "juicebox") >= 0){
-						main.setThirst(main.getThirst()+25);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "coffee") >= 0){
-						main.setThirst(main.getThirst()+15);
-						abletouse = true;
-					//Texts
-					}else if((main.findKeyword(temp.getID(), "newspaper") >= 0)||(main.findKeyword(temp.getID(), "note") >= 0)
-						   ||(main.findKeyword(temp.getID(), "journal") >= 0)||(main.findKeyword(temp.getID(), "notebook") >= 0)
-						   ||(main.findKeyword(temp.getID(), "flight course") >= 0)||(main.findKeyword(temp.getID(), "maze notebook") >= 0)){
-						t.text_text(temp.getID());
-						abletouse = true;
-					}//First Aid
-					else if(main.findKeyword(temp.getID(), "band aids") >= 0){
-						main.setHealth(main.getHealth()+10);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "wrap") >= 0){
-						main.setHealth(main.getHealth()+20);
-						abletouse = true;
-					}else if(main.findKeyword(temp.getID(), "first aid kit") >= 0){
-						main.setHealth(main.getHealth()+50);
-						abletouse = true;
-					}
-				}		
-			}	
-			if (abletouse) {
-				main.addMessage("You have used " + temp.getID(), "AI");
-				temp.setDurability(temp.getDurability() - 1 );
-				if (temp.getDurability() == 0) {
-					//temp.getOutside().x = -1;
-					temp.setLocation(rooms.mountain);
-					temp.setOnPlayer(false);					
-					main.setBag(null, i);
+		Item temp = rooms.player.findItem(statement);			// Find the item in the room
+		if (temp == null) {										// There is nothing in the player's bag
+		   	main.addMessage("You don't have that in your inventory.","AI");
+		}
+		
+		// Valid to use that item
+		else if (temp.getUseRequirement() == null || temp.getUseRequirement() == main.getRoom().getID()) {
+			int [] useResult = temp.getUseResult();
+			
+			// Special Item
+			if (useResult[0] == 0 && useResult[1] == 0 && useResult[2] == 0) {
+				if(temp.getID().equals("engine")){
+					main.setGameEnding(true, 0);
+				}else if(temp.getID().equals("gas")){
+					main.setGameEnding(true, 1);
+				}else if(temp.getID().equals("boat key")){
+					main.setGameEnding(true, 2);
+				}else if(temp.getID().equals("rudder")){
+					main.setGameEnding(true, 3);
+				//Keys
+				}else if(temp.getID().equals("house key")){
+					main.setLockedDoors(true, 0);
+				}else if(temp.getID().equals("shack key")){
+					main.setLockedDoors(true, 1);
+				}else if(temp.getID().equals("treehouse key")){
+					main.setLockedDoors(true, 2);
+				}else if (temp.getID().equals("newspaper") || temp.getID().equals("note") || temp.getID().equals("journal") 
+					   || temp.getID().equals("notebook") || temp.getID().equals("flight course") || temp.getID().equals("maze notebook")){
+					t.text_text(temp.getID());
 				}
-				if(main.getThirst() > 125){
+				DurabilityTest(temp);
+			}
+			// Food or drink or medical supplies
+			else {
+				main.setHunger(main.getHunger() + useResult[0]);		// Increase player hunger stat
+				main.setThirst(main.getThirst() + useResult[1]);		// Increase player thirsty stat
+				main.setHealth(main.getHealth() + useResult[2]);		// Increase player health stat
+				DurabilityTest(temp);
+				if(main.getThirst() > 125){								// No overhydration
 					main.setThirst(125);
 				}
-				if(main.getHunger() > 125){
+				if(main.getHunger() > 125){								// No eating
 					main.setHunger(125);
 				}
-				if(main.getHealth() > 100){
+				if(main.getHealth() > 100){								// No healing
 					main.setHealth(100);
 				}
-				return;
 			}
+		}else {
+		   	main.addMessage("There's nothing to use it on.","AI");
 		}
-		/*
-		if(abletouse){
-			for (int j = 0; j < main.getItems().length; j++){
-				if (main.findKeyword(statement, main.getItems()[j][0]) >= 0){
-					main.setItems(Integer.toString(Integer.parseInt(main.getItems()[j][9])-1), j, 9);
-					main.addMessage("You have used " + statement, "AI");
-					if(Integer.parseInt(main.getItems()[j][9]) == 0){		
-						main.setItems("false", j, 7);
-						main.setItems("-1", j, 1);
-						for (int k = 0; k < main.getBag().length; k++){
-							if (main.getBag()[k] != null){
-								if (main.findKeyword(statement, main.getBag()[k]) >= 0){
-										main.setBag(null, k);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		*/
-		if (!have){
-	   		main.addMessage("You don't have that in your inventory.","AI");
-		}else if(!abletouse){
-	   		main.addMessage("You can't use that here.","AI");
-		}	
 	}
 	
+	// Displays the description of an item
 	public void examineitem(String statement){
 		statement = (statement.substring(7, statement.length())).trim();
-		boolean have = false;
-		//for (int i = 0; i < main.getBag().length; i++){
-		for (Item temp: main.getBag()) {
-			if (temp != null){
-				if (main.findKeyword(statement, temp.getID()) >= 0){
-					have = true;
-					if(main.findKeyword(temp.getID(), "engine") >= 0){
-				   		main.addMessage("It's an engine for a boat.","AI");
-					}else if(main.findKeyword(temp.getID(), "gas") >= 0){
-				   		main.addMessage("It's a container full of fuel.","AI");
-					}else if(main.findKeyword(temp.getID(), "boat key") >= 0){
-				   		main.addMessage("It's a key labeled boat.","AI");
-					}else if(main.findKeyword(temp.getID(), "rudder") >= 0){
-				   		main.addMessage("It's a rudder for a boat.","AI");
-				   	//ETC	
-					}else if(main.findKeyword(temp.getID(), "map") >= 0){
-					   	main.addMessage("It's a map of the island.","AI");
-					}else if(main.findKeyword(temp.getID(), "pocketknife") >= 0){
-					   	main.addMessage("It's a standard pocketknife with scissors, a srewdriver and a knife.","AI");
-					}else if(main.findKeyword(temp.getID(), "wrench") >= 0){
-						main.addMessage("It's a wrench that looks like it could do a lot of damage if swung hard.","AI");	
-					}else if(main.findKeyword(temp.getID(), "sword") >= 0){
-						main.addMessage("It's a sword that looks like it's killed it's number of monsters.","AI");	
-				   	//Keys
-					}else if(main.findKeyword(temp.getID(), "house key") >= 0){
-					   	main.addMessage("It's a key labeled house.","AI");
-					}else if(main.findKeyword(temp.getID(), "shack key") >= 0){
-					   	main.addMessage("It's a key labeled shack.","AI");
-					}else if(main.findKeyword(temp.getID(), "treehouse key") >= 0){
-					   	main.addMessage("It's a key labeled treehouse.","AI");
-					//Food
-					}else if(main.findKeyword(temp.getID(), "sandwich") >= 0){
-					   	main.addMessage("It's a sandwhich that looks like it can fill you up a lot.","AI");
-					}else if(main.findKeyword(temp.getID(), "chips") >= 0){
-					   	main.addMessage("It's a bag of chips that looks like it can fill you up a medium amount.","AI");
-					}else if(main.findKeyword(temp.getID(), "candybar") >= 0){
-					   	main.addMessage("It's a candybar that looks like it can fill you up a little.","AI");
-					}else if(main.findKeyword(temp.getID(), "peanuts") >= 0){
-					   	main.addMessage("It's a bag od chips that looks like it can fill you up a medium amount.","AI");
-					}else if(main.findKeyword(temp.getID(), "pretzels") >= 0){
-					   	main.addMessage("It's a pretzel that looks like it can fill you up a medium amount.","AI");
-					}else if(main.findKeyword(temp.getID(), "blueberries") >= 0){
-					   	main.addMessage("It's a handfull of blueberries that looks like it can fill you up a little.","AI");
-					}else if(main.findKeyword(temp.getID(), "raspberries") >= 0){
-					   	main.addMessage("It's a handfull of raspberries that looks like it can fill you up a little.","AI");
-					}else if(main.findKeyword(temp.getID(), "strawberries") >= 0){
-					   	main.addMessage("It's a handfull of strawberries that looks like it can fill you up a little.","AI");
-					}else if(main.findKeyword(temp.getID(), "blackberries") >= 0){
-					   	main.addMessage("It's a handfull of blackberries that looks like it can fill you up a little.","AI");
-					}else if(main.findKeyword(temp.getID(), "pomegranate") >= 0){
-					   	main.addMessage("It's a handfull of pomegranate that looks like it can fill you up a little.","AI");
-					//Drinks
-					}else if(main.findKeyword(temp.getID(), "water bottle") >= 0){
-					   	main.addMessage("It's a water bottle that looks like it can quench your thirst a lot.","AI");
-					}else if(main.findKeyword(temp.getID(), "bottle of beer") >= 0){
-					   	main.addMessage("It's a bottle of beer that looks like it can quench your thirst a little.","AI");
-					}else if(main.findKeyword(temp.getID(), "bottle of wine") >= 0){
-					   	main.addMessage("It's a bottle of beer that looks like it can quench your thirst a little.","AI");
-					}else if(main.findKeyword(temp.getID(), "sodacan") >= 0){
-					   	main.addMessage("It's a sodae that looks like it can quench your thirst a medium amount.","AI");
-					}else if(main.findKeyword(temp.getID(), "juicebox") >= 0){
-					   	main.addMessage("It's a juicebox that looks like it can quench your thirst a medium amount.","AI");
-					}else if(main.findKeyword(temp.getID(), "coffee") >= 0){
-					   	main.addMessage("It's a cup of coffie that looks like it can quench your thirst a little.","AI");
-					//Texts
-					}else if((main.findKeyword(temp.getID(), "newspaper") >= 0)||(main.findKeyword(temp.getID(), "note") >= 0)
-							   ||(main.findKeyword(temp.getID(), "journal") >= 0)||(main.findKeyword(temp.getID(), "notebook") >= 0)
-							   ||(main.findKeyword(temp.getID(), "flight course") >= 0)||(main.findKeyword(temp.getID(), "maze notebook") >= 0)){
-							t.text_text(temp.getID());					
-					}//First Aid
-					else if(main.findKeyword(temp.getID(), "band aids") >= 0){
-					   	main.addMessage("It's a band-aid that looks like it can heal a little.","AI");
-					}else if(main.findKeyword(temp.getID(), "wrap") >= 0){
-					   	main.addMessage("It's a wrap that looks like it can heal a medium amount.","AI");
-					}else if(main.findKeyword(temp.getID(), "first aid kit") >= 0){
-					   	main.addMessage("It's a wrap that looks like it can heal a lot.","AI");
-					}	
-				}
-			}
-		}if (!have){
+		Item temp = rooms.player.findItem(statement);			// Find the item in the room
+		if (temp == null) {										// There is nothing in the player's bag
 	   		main.addMessage("You don't have that in your inventory.","AI");
+		}else if (temp.getID().equals("newspaper") || temp.getID().equals("note") || temp.getID().equals("journal") 
+			   || temp.getID().equals("notebook") || temp.getID().equals("flight course") || temp.getID().equals("maze notebook")){
+				t.text_text(temp.getID());					
+		}else {
+			main.addMessage(temp.getDescription(), "AI");		// Display description of the item
 		}
 	}
 	
+	// Display player's stats
 	public void diagnose(){
 		main.addMessage("Hunger: " + main.getHunger(), "AI");
 		main.addMessage("Thirst: " + main.getThirst(), "AI");
 		main.addMessage("Health: " + main.getHealth(), "AI");
 	}
 
+	// Display a list of commands
 	public void help(){
 		main.addMessage("Commands:", "AI");
 		main.addMessage("   North          -  to move north", "AI");
@@ -422,12 +222,11 @@ public class Reponses {
 		main.addMessage("   West           -  to move west", "AI");
 		main.addMessage("   Up             -  to ascend", "AI");
 		main.addMessage("   Down           -  to descend", "AI");
-		main.addMessage("   Check Bag      -  to check inventory", "AI");
+		main.addMessage("   Check Bag      -  to check your inventory", "AI");
 		main.addMessage("   Take ______    -  to add _____ to your inventory", "AI");
 		main.addMessage("   Drop ______    -  to drop _____ from your inventory", "AI");
 		main.addMessage("   Use ______     -  to use _____ from your inventory", "AI");
 		main.addMessage("   Examine ______ -  to examine _____ from your inventory", "AI");
 		main.addMessage("   Diagnose       -  to check hunger, thirst, and health levels", "AI");
 	}	
-
 }

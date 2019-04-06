@@ -1,29 +1,26 @@
 
 public class Item {
 
-	private String ID, place;
+	/* This class organizes Item information */
+	
+	private final String ID;
+	private String place;			// Location in the room that the item is
 	private int durability;
-	private boolean onPlayer;
-	private Room location;
-		
-	public Item(String ID, Room location, boolean onPlayer, String place, int durability) {
+	
+	private String description = ""; // Text used when examining the item
+	private String useText = "";	// Text used when using an item
+	
+	private String useRequirement = null; // Location requirement to use the item
+	private int [] useResult = new int [] {0, 0, 0}; // Stats gained from using the item
+
+	public Item(String ID, String place, int durability) {
 		this.ID = ID;
-		this.location = location;
-		this.onPlayer = onPlayer;
 		this.place = place;
 		this.durability = durability;
 	}
 	
-		
 	public String getID() {
 		return ID;
-	}
-	
-	public boolean isOnPlayer() {
-		return onPlayer;
-	}	
-	public void setOnPlayer(boolean onPlayer) {
-		this.onPlayer = onPlayer;
 	}
 	public String getPlace() {
 		return place;
@@ -37,10 +34,28 @@ public class Item {
 	public void setDurability(int durability) {
 		this.durability = durability;
 	}
-	public Room getLocation() {
-		return location;
+	public void setDescription(String description) {
+		this.description = description;
 	}
-	public void setLocation(Room location) {
-		this.location = location;
+	public String getDescription() {
+		return description;
+	}
+	public String getUseText() {
+		return useText;
+	}
+	public void setUseText(String useText) {
+		this.useText = useText;
+	}
+	public String getUseRequirement() {
+		return useRequirement;
+	}
+	public void setUseRequirement(String useRequirement) {
+		this.useRequirement = useRequirement;
+	}
+	public int[] getUseResult() {
+		return useResult;
+	}
+	public void setUseResult(int[] useResult) {
+		this.useResult = useResult;
 	}
 }

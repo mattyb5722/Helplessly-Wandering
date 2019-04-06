@@ -3,14 +3,17 @@ import java.awt.event.KeyEvent;
 
 public class KeyInput extends KeyAdapter{
 	
-	MainBody main;
-	Monster mon;
+	/* This class listens for keyboard inputs */
 	
-	public KeyInput(MainBody main, Monster mon){
+	MainBody main;
+	MonsterManager mon;
+	
+	public KeyInput(MainBody main, MonsterManager mon){
 		this.main = main;
 		this.mon = mon;
 	}
 	
+	// Checks if a key has been pressed
 	public void keyPressed(KeyEvent e){
 		int key = e.getKeyCode();
     	if(main.getMenu() == main.getMenu().GAME){
@@ -88,20 +91,22 @@ public class KeyInput extends KeyAdapter{
 				main.setStatement(main.getStatement()+"9");
 			}else if (key == KeyEvent.VK_SPACE){
 				main.setStatement(main.getStatement()+" ");
-			}else if (key == KeyEvent.VK_BACK_SPACE){
+			}else if (key == KeyEvent.VK_BACK_SPACE){			// Remove a character from statement
 				if(main.getStatement().length()-1 >= 0){
-					main.setStatement(main.getStatement().substring(0,main.getStatement().length()-1));}
-			}else if (key == KeyEvent.VK_ENTER){			
-				main.addMessage(main.getStatement(), "PLAYER");
-				if(main.getPhase() == main.getPhase().MOVING){
-					main.getResponse(main.getStatement());
-				}else if(main.getPhase() == main.getPhase().COMBAT){
-					mon.combat(main.getStatement());
+					String statement = main.getStatement();		// Gets statement
+					statement = statement.substring(0, statement.length()-1); // Removes a character
+					main.setStatement(statement);				// Sets statement
+				}
+			}else if (key == KeyEvent.VK_ENTER){				// Process command
+				main.addMessage(main.getStatement(), "PLAYER"); // Display command
+				if (!main.isInCombat()){						// If not in combat
+					main.GetResponse(main.getStatement());		// Process command this way
+				}else{											// If in combat
+					mon.combat(main.getStatement());			// Process command this way
 				}
 				main.setStatement("");		
 			}
-			main.render();
-			main.render();
-    	}	}
-
+			main.render(); main.render();						// Render screen
+    	}
+    }
 }
